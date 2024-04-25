@@ -1,6 +1,6 @@
 module github.com/terraform-providers/terraform-provider-docker
 
-go 1.19
+go 1.20
 
 require (
 	github.com/client9/misspell v0.3.4
