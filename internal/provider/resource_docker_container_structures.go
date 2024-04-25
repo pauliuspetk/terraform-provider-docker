@@ -287,6 +287,7 @@ func getDockerContainerMounts(container types.ContainerJSON) []map[string]interf
 			}
 			opt := map[string]interface{}{
 				"no_copy": mount.VolumeOptions.NoCopy,
+				"subpath": mount.VolumeOptions.Subpath,
 				"labels":  labels,
 			}
 			if mount.VolumeOptions.DriverConfig != nil {

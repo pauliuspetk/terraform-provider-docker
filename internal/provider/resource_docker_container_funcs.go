@@ -191,6 +191,9 @@ func resourceDockerContainerCreate(ctx context.Context, d *schema.ResourceData, 
 							if value, ok := rawVolumeOptions["no_copy"]; ok {
 								mountInstance.VolumeOptions.NoCopy = value.(bool)
 							}
+							if value, ok := rawVolumeOptions["subpath"]; ok {
+								mountInstance.VolumeOptions.Subpath = value.(string)
+							}
 							if value, ok := rawVolumeOptions["labels"]; ok {
 								mountInstance.VolumeOptions.Labels = labelSetToMap(value.(*schema.Set))
 							}

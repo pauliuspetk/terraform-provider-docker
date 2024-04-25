@@ -201,6 +201,7 @@ Optional:
 - `driver_options` (Map of String) key/value map of driver specific options.
 - `labels` (Block Set) User-defined key/value metadata. (see [below for nested schema](#nestedblock--mounts--volume_options--labels))
 - `no_copy` (Boolean) Populate volume with data from the target.
+- `subpath` (String) Source path inside the volume. Must be relative without any back traversals.
 
 <a id="nestedblock--mounts--volume_options--labels"></a>
 ### Nested Schema for `mounts.volume_options.labels`

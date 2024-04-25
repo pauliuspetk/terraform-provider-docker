@@ -365,6 +365,11 @@ func resourceDockerContainer() *schema.Resource {
 										Description: "Populate volume with data from the target.",
 										Optional:    true,
 									},
+									"subpath": {
+										Type:        schema.TypeString,
+										Description: "Source path inside the volume. Must be relative without any back traversals",
+										Optional:    true,
+									},
 									"labels": {
 										Type:        schema.TypeSet,
 										Description: "User-defined key/value metadata.",

@@ -237,6 +237,7 @@ func flattenServiceMounts(in []mount.Mount) *schema.Set {
 			volumeOptionsItem := make(map[string]interface{})
 
 			volumeOptionsItem["no_copy"] = v.VolumeOptions.NoCopy
+			volumeOptionsItem["subpath"] = v.VolumeOptions.Subpath
 			volumeOptionsItem["labels"] = mapToLabelSet(v.VolumeOptions.Labels)
 			if v.VolumeOptions.DriverConfig != nil {
 				if len(v.VolumeOptions.DriverConfig.Name) > 0 {
@@ -805,6 +806,9 @@ func createContainerSpec(v interface{}) (*swarm.ContainerSpec, error) {
 								rawVolumeOptions := rawVolumeOptions.(map[string]interface{})
 								if value, ok := rawVolumeOptions["no_copy"]; ok {
 									mountInstance.VolumeOptions.NoCopy = value.(bool)
+								}
+								if value, ok := rawVolumeOptions["subpath"]; ok {
+									mountInstance.VolumeOptions.Subpath = value.(string)
 								}
 								if value, ok := rawVolumeOptions["labels"]; ok {
 									mountInstance.VolumeOptions.Labels = labelSetToMap(value.(*schema.Set))

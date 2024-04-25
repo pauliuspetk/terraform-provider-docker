@@ -614,6 +614,7 @@ func TestAccDockerService_fullSpec(t *testing.T) {
 					resource.TestCheckResourceAttr("docker_service.foo", "task_spec.0.container_spec.0.mounts.1.type", "volume"),
 					resource.TestCheckResourceAttr("docker_service.foo", "task_spec.0.container_spec.0.mounts.1.read_only", "true"),
 					resource.TestCheckResourceAttr("docker_service.foo", "task_spec.0.container_spec.0.mounts.1.volume_options.0.no_copy", "true"),
+					resource.TestCheckResourceAttr("docker_service.foo", "task_spec.0.container_spec.0.mounts.1.volume_options.0.subpath", "some/path"),
 					testCheckLabelMap("docker_service.foo", "task_spec.0.container_spec.0.mounts.1.volume_options.0.labels", map[string]string{"foo": "bar"}),
 					resource.TestCheckResourceAttr("docker_service.foo", "task_spec.0.container_spec.0.mounts.1.volume_options.0.driver_name", "random-driver"),
 					resource.TestCheckResourceAttr("docker_service.foo", "task_spec.0.container_spec.0.mounts.1.volume_options.0.driver_options.op1", "val1"),

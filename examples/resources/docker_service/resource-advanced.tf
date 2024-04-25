@@ -76,6 +76,7 @@ resource "docker_service" "foo" {
 
         volume_options {
           no_copy = true
+          subpath = "some/path"
           labels {
             label = "foo"
             value = "bar"

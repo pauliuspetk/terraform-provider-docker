@@ -159,6 +159,7 @@ resource "docker_service" "foo" {
 
         volume_options {
           no_copy = true
+          subpath = "some/path"
           labels {
             label = "foo"
             value = "bar"
@@ -485,6 +486,7 @@ Optional:
 - `driver_options` (Map of String) key/value map of driver specific options
 - `labels` (Block Set) User-defined key/value metadata (see [below for nested schema](#nestedblock--task_spec--container_spec--mounts--volume_options--labels))
 - `no_copy` (Boolean) Populate volume with data from the target
+- `subpath` (String) Source path inside the volume. Must be relative without any back traversals
 
 <a id="nestedblock--task_spec--container_spec--mounts--volume_options--labels"></a>
 ### Nested Schema for `task_spec.container_spec.mounts.volume_options.labels`
