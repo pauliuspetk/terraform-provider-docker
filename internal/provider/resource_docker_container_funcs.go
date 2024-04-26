@@ -238,7 +238,7 @@ func resourceDockerContainerCreate(ctx context.Context, d *schema.ResourceData, 
 		Privileged:      d.Get("privileged").(bool),
 		PublishAllPorts: d.Get("publish_all_ports").(bool),
 		RestartPolicy: container.RestartPolicy{
-			Name:              d.Get("restart").(string),
+			Name:              container.RestartPolicyMode(d.Get("restart").(string)),
 			MaximumRetryCount: d.Get("max_retry_count").(int),
 		},
 		Runtime:        d.Get("runtime").(string),
@@ -381,7 +381,7 @@ func resourceDockerContainerCreate(ctx context.Context, d *schema.ResourceData, 
 		hostConfig.StorageOpt = mapTypeMapValsToString(v.(map[string]interface{}))
 	}
 
-	var retContainer container.ContainerCreateCreatedBody
+	var retContainer container.CreateResponse
 
 	// TODO mavogel add platform later which comes from API v1.41. Currently we pass nil
 	if retContainer, err = client.ContainerCreate(ctx, config, hostConfig, networkingConfig, nil, d.Get("name").(string)); err != nil {
@@ -495,7 +495,7 @@ func resourceDockerContainerCreate(ctx context.Context, d *schema.ResourceData, 
 
 	if d.Get("start").(bool) {
 		creationTime = time.Now()
-		options := types.ContainerStartOptions{}
+		options := container.StartOptions{}
 		if err := client.ContainerStart(ctx, retContainer.ID, options); err != nil {
 			return diag.Errorf("Unable to start container: %s", err)
 		}
@@ -541,7 +541,7 @@ func resourceDockerContainerCreate(ctx context.Context, d *schema.ResourceData, 
 		if d.Get("logs").(bool) {
 			go func() {
 				defer func() { logsRead <- true }()
-				reader, err := client.ContainerLogs(ctx, retContainer.ID, types.ContainerLogsOptions{
+				reader, err := client.ContainerLogs(ctx, retContainer.ID, container.LogsOptions{
 					ShowStdout: true,
 					ShowStderr: true,
 					Follow:     true,
@@ -837,7 +837,7 @@ func resourceDockerContainerUpdate(ctx context.Context, d *schema.ResourceData, 
 
 			updateConfig := container.UpdateConfig{
 				RestartPolicy: container.RestartPolicy{
-					Name:              d.Get("restart").(string),
+					Name:              container.RestartPolicyMode(d.Get("restart").(string)),
 					MaximumRetryCount: d.Get("max_retry_count").(int),
 				},
 				Resources: container.Resources{
@@ -871,18 +871,25 @@ func resourceDockerContainerDelete(ctx context.Context, d *schema.ResourceData, 
 
 	if !d.Get("attach").(bool) {
 		// Stop the container before removing if destroy_grace_seconds is defined
-		var timeout time.Duration
-		if d.Get("destroy_grace_seconds").(int) > 0 {
-			timeout = time.Duration(int32(d.Get("destroy_grace_seconds").(int))) * time.Second
+		var timeoutSec *int
+		destroyGraceSeconds := d.Get("destroy_grace_seconds").(int)
+		if destroyGraceSeconds > 0 {
+			timeout := destroyGraceSeconds
+			timeoutSec = &timeout
+		} else {
+			timeoutSec = nil // Use nil to apply the default Docker timeout
 		}
 
-		log.Printf("[INFO] Stopping Container '%s' with timeout %v", d.Id(), timeout)
-		if err := client.ContainerStop(ctx, d.Id(), &timeout); err != nil {
+		log.Printf("[INFO] Stopping Container '%s' with timeout %v seconds", d.Id(), timeoutSec)
+		stopOptions := container.StopOptions{
+			Timeout: timeoutSec,
+		}
+		if err := client.ContainerStop(ctx, d.Id(), stopOptions); err != nil {
 			return diag.Errorf("Error stopping container %s: %s", d.Id(), err)
 		}
 	}
 
-	removeOpts := types.ContainerRemoveOptions{
+	removeOpts := container.RemoveOptions{
 		RemoveVolumes: d.Get("remove_volumes").(bool),
 		RemoveLinks:   d.Get("rm").(bool),
 		Force:         true,
@@ -917,7 +924,7 @@ func resourceDockerContainerDelete(ctx context.Context, d *schema.ResourceData, 
 }
 
 func fetchDockerContainer(ctx context.Context, ID string, client *client.Client) (*types.Container, error) {
-	apiContainers, err := client.ContainerList(ctx, types.ContainerListOptions{All: true})
+	apiContainers, err := client.ContainerList(ctx, container.ListOptions{All: true})
 	if err != nil {
 		return nil, fmt.Errorf("error fetching container information from Docker: %s\n", err)
 	}
