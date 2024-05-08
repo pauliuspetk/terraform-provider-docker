@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -428,7 +429,7 @@ func TestAccDockerImage_build(t *testing.T) {
 	ctx := context.Background()
 	wd, _ := os.Getwd()
 	dfPath := filepath.Join(wd, "Dockerfile")
-	if err := os.WriteFile(dfPath, []byte(testDockerFileExample), 0o644); err != nil {
+	if err := ioutil.WriteFile(dfPath, []byte(testDockerFileExample), 0o644); err != nil {
 		t.Fatalf("failed to create a Dockerfile %s for test: %+v", dfPath, err)
 	}
 	defer os.Remove(dfPath)
@@ -450,7 +451,7 @@ func TestAccDockerImage_build(t *testing.T) {
 }
 
 const testDockerFileExample = `
-FROM python:3-bookworm
+FROM python:3-stretch
 
 WORKDIR /app
 
@@ -466,7 +467,7 @@ func TestAccDockerImage_buildOutsideContext(t *testing.T) {
 	ctx := context.Background()
 	wd, _ := os.Getwd()
 	dfPath := filepath.Join(wd, "..", "Dockerfile")
-	if err := os.WriteFile(dfPath, []byte(testDockerFileExample), 0o644); err != nil {
+	if err := ioutil.WriteFile(dfPath, []byte(testDockerFileExample), 0o644); err != nil {
 		t.Fatalf("failed to create a Dockerfile %s for test: %+v", dfPath, err)
 	}
 	defer os.Remove(dfPath)

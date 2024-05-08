@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 	"strings"
@@ -448,7 +449,7 @@ func resourceDockerContainerCreate(ctx context.Context, d *schema.ResourceData, 
 				contentToUpload = string(decoded)
 			}
 			if source != "" {
-				sourceContent, err := os.ReadFile(source)
+				sourceContent, err := ioutil.ReadFile(source)
 				if err != nil {
 					return diag.Errorf("could not read file: %s", err)
 				}
