@@ -2,6 +2,7 @@ package provider
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -45,7 +46,7 @@ func loadTestConfiguration(t *testing.T, resourceType resourceType, resourceName
 
 	testConfig := strings.ReplaceAll(filepath.Join(wd, "..", "..", TEST_CONFIG_BASE_DIR, resourceType.String(), resourceName, fmt.Sprintf("%s.tf", testName)), "\\", "\\\\")
 
-	testConfigContent, err := os.ReadFile(testConfig)
+	testConfigContent, err := ioutil.ReadFile(testConfig)
 	if err != nil {
 		t.Errorf("failed to read test configuration at '%s': %v", testConfig, err)
 	}
